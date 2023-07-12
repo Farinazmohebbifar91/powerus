@@ -53,6 +53,11 @@ export class FlightService {
           flight: 'slices.flight',
         },
       },
+      order:{
+        slices: {
+          order: 'ASC'
+        }
+      }
     });
     return flightSuggestions.map((suggestion) => {
       return {
@@ -69,6 +74,17 @@ export class FlightService {
         price: suggestion.price,
       };
     });
+  }
+
+  async getLastValidReadingIds() {
+    const urls = await this.getUrls();
+    return urls
+      .filter(
+        (url) =>
+          url.lastReadingId &&
+          url.reading.time >= sub(new Date(), { hours: 1 }),
+      )
+      .map((url) => url.lastReadingId);
   }
 
   async getFlight(flight: FlightLike) {
@@ -106,7 +122,7 @@ export class FlightService {
     return expiredsuggestions.map((suggestion) => suggestion.id);
   }
 
-  async removeOldRecords() {
+  async removeOldData() {
     const expiredSuggestionIds = await this.getExpiredSuggestionIds();
     await this.flightSliceRepository.delete({
       flightSuggestionId: In(expiredSuggestionIds),
@@ -114,7 +130,9 @@ export class FlightService {
     const deletedSuggestions = await this.flightSuggestionRepository.delete({
       id: In(expiredSuggestionIds),
     });
-    //todo: delete all flights not used in any slices
+    // TODO: delete all flights not used in any slices
+    // TODO: delete old readings. Also might need to set lastReadingId to null for the related URL
+    // if it does not have any newer readings
     return deletedSuggestions;
   }
 }
