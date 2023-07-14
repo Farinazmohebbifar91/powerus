@@ -66,7 +66,7 @@ endpoints and send it to the client. I check data to discard the ones that are o
 and not sending to client.
 
 ** flight service
-I added flight services for our request to DB and repository connections
+I added flight services for our requests to DB and repository connections (we could have separate services for each meaningful repository but as it was a small project I kept all of them together)
 
 ** Database
 If you wanna have look on DB you can check flightDB file on route path 
